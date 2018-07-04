@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <title>Noticias</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <h1>Bienvenido {{ user|title }}</h1>
+        {% for noticia in noticias %}
+            <h2>{{ noticia.titulo|title }}</h2>
+            <p>ID de noticia: {{ noticia.id }}</p>
+            <h6>{{ noticia.fecha }}</h6>
+            <p>{{ noticia.texto }}</p>
+            <br>
+            <h6>Comentarios</h6>
+            {% for comentario in noticia.comentarios.all %}
+                <p style="color: red">{{ comentario.usuario }}</p>
+                <p style="color: blue; margin-bottom: 10px">{{ comentario.comentario }}</p>
+                {% if user.is_authenticated and user.id == comentario.usuario.id %}
+                    <form method="POST" action="{% url 'borrar_comentario' noticia_id=noticia.id comentario_id=comentario.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Borrar comentario</button>
+                    </form>
+                {% endif %}
+            {% endfor %}
+            <h5>Agregar un comentario</h5>
+            <form method="POST" action="{% url 'agregar_comentario' noticia_id=noticia.id %}">
+                {% csrf_token %}
+                <input type="textarea" placeholder="Comentar algo..." name="comentario">
+                <button type="submit">Enviar comentario</button>
+            </form>
+        {% empty %}
+            <p>No hay noticias.</p>
+        {% endfor %}
+    </body>
+</html>
